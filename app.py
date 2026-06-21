@@ -27,31 +27,93 @@ def cleanup_json_at_startup(wipe_inventory=False):
 cleanup_json_at_startup(wipe_inventory=False)
 
 def initialize_models():
-    if not os.path.exists(MODEL_DIR): os.makedirs(MODEL_DIR)
+    if not os.path.exists(MODEL_DIR):
+        os.makedirs(MODEL_DIR)
+        
     model_generic = {
-        "model": "generic", "description": "Global SIP & Network Settings",
+        "model": "generic",
+        "description": "Global SIP & Network Settings",
         "settings": [
             {"key": "dhcp", "label": "DHCP (1=On, 0=Off)", "type": "choice", "options": ["1", "0"]},
+            {"key": "lldp", "label": "LLDP (1=On, 0=Off)", "type": "choice", "options": ["1", "0"]},
             {"key": "tftp server", "label": "TFTP Server IP Address", "type": "string"},
             {"key": "sip line1 screen name", "label": "Screen Label (Line 1)", "type": "string"},
             {"key": "sip line1 auth name", "label": "SIP Auth Name / Extension", "type": "string"},
             {"key": "sip line1 password", "label": "SIP Auth Password", "type": "string"},
+            {"key": "sip line1 user name", "label": "SIP User Name (Display)", "type": "string"},
             {"key": "sip line1 proxy ip", "label": "SIP Proxy / PBX IP", "type": "string"},
-            {"key": "ring tone", "label": "Ringtone ID (1-5)", "type": "choice", "options": ["1", "2", "3", "4", "5"]}
+            {"key": "sip line1 proxy port", "label": "SIP Proxy Port (Default 5060)", "type": "string"},
+            {"key": "sip line1 registrar ip", "label": "Registrar / Server IP", "type": "string"},
+            {"key": "sip line1 registrar port", "label": "Registrar Port (Default 5060)", "type": "string"},
+            {"key": "aastra md5", "label": "Aastra MD5 Config Hash", "type": "string"},
+            {"key": "mac md5", "label": "MAC Config MD5 Hash", "type": "string"},
+            {"key": "time server1", "label": "NTP Time Server", "type": "string"},
+            {"key": "date format", "label": "Date Format", "type": "choice", "options": ["0", "1", "2", "3"]},
+            {"key": "time format", "label": "Time Format (1=24H, 0=12H)", "type": "choice", "options": ["0", "1"]},
+            {"key": "contact rcs", "label": "Contact RCS (0=Off, 1=On)", "type": "choice", "options": ["0", "1"]},
+            {"key": "time zone name", "label": "Time Zone String", "type": "string"},
+            {"key": "language 1", "label": "Phone Language 1", "type": "string"},
+            {"key": "language 2", "label": "Phone Language 2", "type": "string"},
+            {"key": "language 3", "label": "Phone Language 3", "type": "string"},
+            {"key": "language", "label": "Number of languages (1-3)", "type": "choice", "options": ["1", "2", "3"]},
+            {"key": "tone set", "label": "Region Tone", "type": "string"},
+            {"key": "ring tone", "label": "Ringtone ID (1-5)", "type": "choice", "options": ["1", "2", "3", "4", "5"]},
+            {"key": "web language", "label": "Web Interface Language (1=Fr, 0=En)", "type": "choice", "options": ["1", "0"]},
+            {"key": "input language", "label": "Phone Input Language", "type": "string"},
+            {"key": "sip dial plan", "label": "Dial Plan Rules", "type": "string"},
+            {"key": "directed call pickup", "label": "Directed Call Pickup (1=On, 0=Off)", "type": "choice", "options": ["1", "0"]},
+            {"key": "directed call pickup prefix", "label": "Directed Call Pickup Prefix", "type": "string"},
+            {"key": "handset volume", "label": "Handset Volume (1-10)", "type": "string"},
+            {"key": "speaker volume", "label": "Speaker Volume (1-10)", "type": "string"},
+            {"key": "ringer volume", "label": "Ringer Volume (1-10)", "type": "string"},
+            {"key": "directory 1 name", "label": "Directory Display Name", "type": "string"},
+            {"key": "directory 1", "label": "Directory File / URI", "type": "string"}
         ]
     }
-    settings_6867i = [
-        {"key": "background image", "label": "Wallpaper Filename", "type": "string"},
-        {"key": "background image display mode", "label": "Wallpaper Scaling", "type": "choice", "options": ["0", "1"]}
-    ]
-    for i in range(1, 11):
-        settings_6867i.extend([{"key": f"topsoftkey{i} type", "label": f"Top Key {i} Type", "type": "choice", "options": ["none", "speeddial", "blf"]}])
-    model_6867i = {"model": "6867i", "description": "Mitel 6867i", "settings": settings_6867i}
 
-    for name, data in [("generic", model_generic), ("6867i", model_6867i)]:
+    settings_6867i = [
+        {"key": "background image", "label": "Wallpaper Filename (.png/.jpg)", "type": "string"},
+        {"key": "background image display mode", "label": "Wallpaper Scaling (0=Centered, 1=Stretched)", "type": "choice", "options": ["0", "1"]},
+        {"key": "screen saver background image", "label": "Screensaver Image File (.jpg)", "type": "string"},
+        {"key": "screen saver timer", "label": "Screensaver Timeout (Seconds)", "type": "string"}
+    ]
+
+    softkey_types = ["none", "pickup", "speeddial", "blf", "xml", "line", "dnd", "park", "paging"]
+    
+    for i in range(1, 11):
+        settings_6867i.extend([
+            {"key": f"topsoftkey{i} type", "label": f"Top Key {i} Type", "type": "choice", "options": softkey_types},
+            {"key": f"topsoftkey{i} label", "label": f"Top Key {i} Display Label", "type": "string"},
+            {"key": f"topsoftkey{i} value", "label": f"Top Key {i} Value", "type": "string"}
+        ])
+
+    for i in range(1, 21):
+        settings_6867i.extend([
+            {"key": f"softkey{i} type", "label": f"Key {i} Type", "type": "choice", "options": softkey_types},
+            {"key": f"softkey{i} label", "label": f"Key {i} Display Label", "type": "string"},
+            {"key": f"softkey{i} value", "label": f"Key {i} Value", "type": "string"}
+        ])
+    
+    model_6867i = {"model": "6867i", "description": "Mitel 6867i Configuration", "settings": settings_6867i}
+
+    settings_6863i = []
+    pnh_types = ["none", "pickup", "speeddial", "blf", "xml", "line", "dnd", "park", "paging"]
+    
+    for i in range(1, 10):
+        settings_6863i.extend([
+            {"key": f"pnhkeypad{i} type", "label": f"Prog Key {i} Type", "type": "choice", "options": pnh_types},
+            {"key": f"pnhkeypad{i} prepend", "label": f"Prog Key {i} Prefix", "type": "string"},
+            {"key": f"pnhkeypad{i} value", "label": f"Prog Key {i} Value (Dest)", "type": "string"},
+            {"key": f"pnhkeypad{i} line", "label": f"Prog Key {i} Line (Default 1)", "type": "string"}
+        ])
+
+    model_6863i = {"model": "6863i", "description": "Mitel 6863i Configuration", "settings": settings_6863i}
+
+    for name, data in [("generic", model_generic), ("6867i", model_6867i), ("6863i", model_6863i)]:
         filepath = f"{MODEL_DIR}/{name}.json"
         if not os.path.exists(filepath):
-            with open(filepath, "w") as f: json.dump(data, f, indent=4)
+            with open(filepath, "w") as f:
+                json.dump(data, f, indent=4)
 
 initialize_models()
 
