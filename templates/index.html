@@ -411,31 +411,49 @@
         // --- Core Functions ---
         async function loadSchema() {
             const model = document.querySelector('input[name="modelRadio"]:checked').value;
-            const res = await fetch(`/api/schema/${model}`);
-            const data = await res.json();
             const container = document.getElementById('dynamicFields');
             container.innerHTML = '';
 
-            data.settings.forEach(setting => {
-                const col = document.createElement('div');
-                col.className = 'col-12 col-md-6 mb-2';
-                const val = activeEditorData[setting.key] || "";
+            // Helper function to build the form inputs with visual section headers
+            const buildFields = (settings, sectionTitle) => {
+                const titleRow = document.createElement('div');
+                titleRow.className = 'col-12 mt-4 mb-2 border-bottom border-secondary';
+                titleRow.innerHTML = `<h6 class="text-info fw-bold mb-1">${sectionTitle}</h6>`;
+                container.appendChild(titleRow);
 
-                let inputHtml = `<label class="form-label text-secondary fw-bold mb-1">${setting.label}</label>`;
-                if (setting.type === 'choice') {
-                    inputHtml += `<select name="${setting.key}" class="form-select form-select-lg shadow-sm">`;
-                    inputHtml += `<option value=""></option>`;
-                    setting.options.forEach(opt => {
-                        const selected = (opt === val) ? 'selected' : '';
-                        inputHtml += `<option value="${opt}" ${selected}>${opt}</option>`;
-                    });
-                    inputHtml += `</select>`;
-                } else {
-                    inputHtml += `<input type="text" name="${setting.key}" class="form-control form-control-lg shadow-sm" value="${val}">`;
-                }
-                col.innerHTML = inputHtml;
-                container.appendChild(col);
-            });
+                settings.forEach(setting => {
+                    const col = document.createElement('div');
+                    col.className = 'col-12 col-md-6 mb-2';
+                    const val = activeEditorData[setting.key] || "";
+
+                    let inputHtml = `<label class="form-label text-secondary fw-bold mb-1">${setting.label}</label>`;
+                    if (setting.type === 'choice') {
+                        inputHtml += `<select name="${setting.key}" class="form-select form-select-lg shadow-sm">`;
+                        inputHtml += `<option value=""></option>`;
+                        setting.options.forEach(opt => {
+                            const selected = (opt === val) ? 'selected' : '';
+                            inputHtml += `<option value="${opt}" ${selected}>${opt}</option>`;
+                        });
+                        inputHtml += `</select>`;
+                    } else {
+                        inputHtml += `<input type="text" name="${setting.key}" class="form-control form-control-lg shadow-sm" value="${val}">`;
+                    }
+                    col.innerHTML = inputHtml;
+                    container.appendChild(col);
+                });
+            };
+
+            // 1. ALWAYS load the Generic Settings first
+            const resGen = await fetch(`/api/schema/generic`);
+            const dataGen = await resGen.json();
+            buildFields(dataGen.settings, "⚙️ Global Network & SIP Settings");
+
+            // 2. If a specific phone is selected, stack its custom settings at the bottom
+            if (model !== 'generic') {
+                const resMod = await fetch(`/api/schema/${model}`);
+                const dataMod = await resMod.json();
+                buildFields(dataMod.settings, `📱 ${model.toUpperCase()} Specific Settings`);
+            }
         }
 
         async function fetchSftpList() {
