@@ -42,8 +42,9 @@
         /* Inputs and Dropdowns */
         .form-control,
         .form-select {
-            background-color: #1c2128;
-            color: #e0e6ed;
+            background-color: #161b22 !important;
+            color: #ffffff !important;
+            /* Forces bright white text */
             border: 1px solid #3c414b;
             border-radius: 6px;
             padding: 0.6rem;
@@ -51,10 +52,16 @@
 
         .form-control:focus,
         .form-select:focus {
-            background-color: #161b22;
-            color: white;
+            background-color: #0d1117 !important;
+            color: #ffffff !important;
             border-color: #0072ce;
             box-shadow: 0 0 0 0.2rem rgba(0, 114, 206, 0.25);
+        }
+
+        /* Fixes the invisible placeholder text */
+        .form-control::placeholder {
+            color: #8b949e !important;
+            opacity: 1;
         }
 
         /* Standard Buttons */
