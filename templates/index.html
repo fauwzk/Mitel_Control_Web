@@ -12,7 +12,6 @@
             background-color: #1c2128;
             color: #e0e6ed;
             font-size: 0.95rem;
-            scroll-behavior: smooth;
         }
 
         /* Stop mobile browsers from zooming in on inputs */
@@ -44,7 +43,6 @@
         .form-select {
             background-color: #161b22 !important;
             color: #ffffff !important;
-            /* Forces bright white text */
             border: 1px solid #3c414b;
             border-radius: 6px;
             padding: 0.6rem;
@@ -58,7 +56,6 @@
             box-shadow: 0 0 0 0.2rem rgba(0, 114, 206, 0.25);
         }
 
-        /* Fixes the invisible placeholder text */
         .form-control::placeholder {
             color: #8b949e !important;
             opacity: 1;
@@ -77,12 +74,37 @@
             border-color: #0072ce;
         }
 
+        /* Model Selection Radio Buttons (Horizontally Scrollable) */
+        .model-selector-wrapper {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .model-selector-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .btn-outline-model {
+            color: #8b949e;
+            border-color: #3c414b;
+            background-color: #232830;
+        }
+
+        .btn-check:checked+.btn-outline-model {
+            background-color: #00509a;
+            color: white;
+            border-color: #0072ce;
+        }
+
         /* Massive Touch Targets for Lists */
         .list-group-item {
             background-color: #1c2128;
             color: #e0e6ed;
             border-color: #3c414b;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .list-group-item:active,
@@ -94,10 +116,10 @@
         /* Floating Alerts */
         .alert-floating {
             position: fixed;
-            top: 20px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 2000;
+            z-index: 2050;
             min-width: 90%;
             max-width: 400px;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
@@ -106,6 +128,7 @@
             border: 1px solid #0072ce;
             text-align: center;
             border-radius: 8px;
+            font-weight: bold;
         }
 
         .alert-danger {
@@ -113,13 +136,15 @@
             border-color: #ff0000;
         }
 
-        /* Mobile Specific Overrides */
+        /* --- MOBILE SPECIFIC LOGIC --- */
         @media (max-width: 991px) {
             body {
-                padding-bottom: 80px;
+                padding-bottom: 75px;
             }
 
             /* Space for bottom nav */
+
+            /* Native App Bottom Bar */
             .mobile-bottom-bar {
                 display: flex;
                 position: fixed;
@@ -129,10 +154,11 @@
                 z-index: 1030;
                 background: #161b22;
                 border-top: 1px solid #3c414b;
-                padding: 0.5rem 0.25rem;
+                padding: 0.4rem 0.25rem;
                 justify-content: space-evenly;
                 align-items: center;
                 box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+                padding-bottom: env(safe-area-inset-bottom);
             }
 
             .nav-btn {
@@ -140,98 +166,98 @@
                 text-decoration: none;
                 font-size: 0.8rem;
                 text-align: center;
-                padding: 0.5rem 1rem;
+                padding: 0.4rem 0;
                 border-radius: 8px;
                 width: 30%;
+                transition: 0.2s;
+                border: none;
+                background: transparent;
             }
 
-            .nav-btn:active,
-            .nav-btn:focus {
-                background-color: #2d323a;
-                color: white;
+            .nav-btn.active {
+                color: #0072ce;
+                font-weight: bold;
             }
 
             .nav-icon {
                 display: block;
-                font-size: 1.4rem;
+                font-size: 1.5rem;
                 margin-bottom: 2px;
             }
 
+            /* Sticky Editor Push Button */
             .sticky-mobile-push {
                 position: sticky;
                 top: 0;
                 z-index: 1020;
                 padding: 10px 0;
-                background-color: #232830;
+                background-color: #1c2128;
                 border-bottom: 1px solid #3c414b;
+                margin-bottom: 15px;
             }
         }
 
-        /* Toggle Button Group Styles */
-        .btn-outline-model {
-            color: #8b949e;
-            border-color: #3c414b;
-            background-color: #232830;
-        }
-
-        .btn-check:checked+.btn-outline-model {
-            background-color: #00509a;
-            color: white;
-            border-color: #0072ce;
-            box-shadow: none;
-        }
-
-        .btn-outline-model:hover {
-            background-color: #2d323a;
-            color: white;
-        }
-
+        /* --- DESKTOP SPECIFIC LOGIC --- */
         @media (min-width: 992px) {
             .mobile-bottom-bar {
                 display: none;
             }
+
+            .app-section {
+                display: block !important;
+            }
+
+            /* Force all columns to show on desktop */
         }
     </style>
 </head>
 
 <body>
 
-    <div id="statusAlert" class="alert d-none alert-floating font-weight-bold p-3" role="alert"></div>
+    <div id="statusAlert" class="alert d-none alert-floating p-3" role="alert"></div>
 
-    <div class="container-fluid py-3">
+    <div class="container-fluid py-lg-4 py-2">
         <div class="row g-4">
 
-            <div class="col-12 col-lg-6" id="editor-section">
+            <div class="col-12 col-lg-6 app-section" id="editor-section">
                 <div class="card h-100 shadow">
-                    <div class="card-header fs-5">⚙️ Editor Setup</div>
-                    <div class="card-body">
+                    <div class="card-header fs-5 d-none d-lg-block">⚙️ Editor Setup</div>
+                    <div class="card-body px-3 py-2 py-lg-3">
+
+                        <div class="sticky-mobile-push text-center d-lg-none">
+                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow"
+                                style="background-color:#00509a;" onclick="generateAndUpload()">🚀 PUSH CONFIG TO
+                                SERVER</button>
+                        </div>
 
                         <div class="mb-3">
-                            <label class="form-label text-muted fw-bold small">1. Select Target Model</label>
-                            <div class="btn-group w-100 shadow-sm" role="group" aria-label="Model Selection">
-                                <input type="radio" class="btn-check" name="modelRadio" id="model_generic"
-                                    value="generic" autocomplete="off" checked onchange="loadSchema()">
-                                <label class="btn btn-outline-model fw-bold py-2" for="model_generic">Generic</label>
+                            <label class="form-label text-muted fw-bold small mb-1">Target Model</label>
+                            <div class="model-selector-wrapper">
+                                <div class="btn-group shadow-sm" role="group">
+                                    <input type="radio" class="btn-check" name="modelRadio" id="model_generic"
+                                        value="generic" autocomplete="off" checked onchange="loadSchema()">
+                                    <label class="btn btn-outline-model fw-bold py-2 px-4"
+                                        for="model_generic">Generic</label>
 
-                                {% for model in models %}
-                                {% if model != 'generic' %}
-                                <input type="radio" class="btn-check" name="modelRadio" id="model_{{ model }}"
-                                    value="{{ model }}" autocomplete="off" onchange="loadSchema()">
-                                <label class="btn btn-outline-model fw-bold py-2" for="model_{{ model }}">{{ model
-                                    }}</label>
-                                {% endif %}
-                                {% endfor %}
+                                    {% for model in models %}
+                                    {% if model != 'generic' %}
+                                    <input type="radio" class="btn-check" name="modelRadio" id="model_{{ model }}"
+                                        value="{{ model }}" autocomplete="off" onchange="loadSchema()">
+                                    <label class="btn btn-outline-model fw-bold py-2 px-4" for="model_{{ model }}">{{
+                                        model }}</label>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label text-muted fw-bold small">2. Target Filename (.cfg)</label>
-                            <input type="text" id="filenameInput"
-                                class="form-control form-control-lg text-center text-info fw-bold"
+                        <div class="mb-3 border-bottom border-secondary pb-4">
+                            <label class="form-label text-muted fw-bold small mb-1">Target Filename (.cfg)</label>
+                            <input type="text" id="filenameInput" class="form-control form-control-lg text-info fw-bold"
                                 placeholder="00085DXXXXXX.cfg">
                         </div>
 
-                        <div class="sticky-mobile-push mb-4 text-center pb-4 border-bottom border-secondary">
+                        <div class="mb-4 text-center d-none d-lg-block">
                             <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
                                 style="background-color:#00509a;" onclick="generateAndUpload()">🚀 PUSH CONFIG VIA
                                 SFTP</button>
@@ -244,10 +270,10 @@
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-lg-3" id="sftp-section">
+            <div class="col-12 col-lg-3 app-section d-none d-lg-block" id="sftp-section">
                 <div class="card shadow mb-4">
-                    <div class="card-header">🔑 SFTP Server</div>
-                    <div class="card-body">
+                    <div class="card-header">🔑 SFTP Connection</div>
+                    <div class="card-body px-3 py-3">
                         <div class="row g-2">
                             <div class="col-6"><input type="text" id="sftpHost" class="form-control" value="10.19.13.1"
                                     placeholder="Host"></div>
@@ -269,39 +295,40 @@
                     </div>
                     <div class="card-body p-0">
                         <div id="serverFileList" class="list-group list-group-flush"
-                            style="max-height: 400px; overflow-y: auto;">
+                            style="max-height: 50vh; overflow-y: auto;">
                             <div class="p-4 text-muted text-center fs-6">Tap Refresh to load files</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-lg-3" id="inventory-section">
+            <div class="col-12 col-lg-3 app-section d-none d-lg-block" id="inventory-section">
                 <div class="card shadow mb-4">
-                    <div class="card-header">📱 Device Actions</div>
-                    <div class="card-body">
-                        <label class="form-label text-muted fw-bold">Target Phone IP</label>
-                        <div class="input-group input-group-lg mb-3">
-                            <input type="text" id="invIp" class="form-control" placeholder="10.x.x.x">
-                            <button class="btn btn-info fw-bold" onclick="fetchMac()">Get MAC</button>
+                    <div class="card-header">📱 Device Commands</div>
+                    <div class="card-body px-3 py-3">
+                        <label class="form-label text-muted fw-bold small mb-1">Target Phone IP</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="invIp" class="form-control form-control-lg" placeholder="10.x.x.x">
+                            <button class="btn btn-info fw-bold px-3" onclick="fetchMac()">MAC</button>
                         </div>
-                        <label class="form-label text-muted fw-bold">Reboot Device</label>
-                        <div class="input-group input-group-lg">
-                            <input type="password" id="phoneWebPass" class="form-control" value="22222"
-                                placeholder="Web Pass">
-                            <button class="btn btn-warning fw-bold text-dark" onclick="rebootPhone()">Reboot</button>
+                        <label class="form-label text-muted fw-bold small mb-1">Reboot Device</label>
+                        <div class="input-group">
+                            <input type="password" id="phoneWebPass" class="form-control form-control-lg" value="22222"
+                                placeholder="Pass">
+                            <button class="btn btn-warning fw-bold text-dark px-3"
+                                onclick="rebootPhone()">Reboot</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="card shadow">
-                    <div class="card-header">💾 Saved Database</div>
+                    <div class="card-header">💾 Phone Database</div>
                     <div class="card-body p-0">
-                        <div class="list-group list-group-flush mb-2" style="max-height: 300px; overflow-y: auto;">
+                        <div class="list-group list-group-flush mb-2" style="max-height: 40vh; overflow-y: auto;">
                             {% for ep in endpoints %}
-                            <button type="button" class="list-group-item py-3 fs-6"
-                                onclick="document.getElementById('filenameInput').value = '{{ ep.mac.replace(':', '').lower() }}.cfg'; window.scrollTo(0,0);">
-                                <strong class="text-info">{{ ep.mac }}</strong><br>
+                            <button type="button" class="list-group-item py-3"
+                                onclick="loadEndpointToEditor('{{ ep.mac }}')">
+                                <strong class="text-info fs-5">{{ ep.mac }}</strong><br>
                                 <span class="text-light">{{ ep.ip }} - {{ ep.label }}</span>
                             </button>
                             {% else %}
@@ -309,7 +336,7 @@
                             {% endfor %}
                         </div>
                         <div class="p-3 border-top border-secondary">
-                            <label class="form-label text-muted fw-bold small">Import endpoints.json</label>
+                            <label class="form-label text-muted fw-bold small mb-1">Import endpoints.json</label>
                             <div class="input-group">
                                 <input type="file" id="importFile" class="form-control" accept=".json">
                                 <button class="btn btn-outline-light" onclick="importEndpoints()">Import</button>
@@ -323,18 +350,55 @@
     </div>
 
     <div class="mobile-bottom-bar">
-        <a href="#editor-section" class="nav-btn"><span class="nav-icon">⚙️</span>Editor</a>
-        <a href="#sftp-section" class="nav-btn"><span class="nav-icon">📁</span>Server</a>
-        <a href="#inventory-section" class="nav-btn"><span class="nav-icon">📱</span>Devices</a>
+        <button class="nav-btn active" id="nav-editor" onclick="switchTab('editor-section', 'nav-editor')">
+            <span class="nav-icon">⚙️</span>Editor
+        </button>
+        <button class="nav-btn" id="nav-sftp" onclick="switchTab('sftp-section', 'nav-sftp')">
+            <span class="nav-icon">📁</span>Files
+        </button>
+        <button class="nav-btn" id="nav-inventory" onclick="switchTab('inventory-section', 'nav-inventory')">
+            <span class="nav-icon">📱</span>Devices
+        </button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let activeEditorData = {};
 
+        // --- Mobile Tab Switching Logic ---
+        function switchTab(sectionId, navId) {
+            if (window.innerWidth < 992) {
+                // Hide all sections
+                document.querySelectorAll('.app-section').forEach(el => el.classList.remove('d-block'));
+                document.querySelectorAll('.app-section').forEach(el => el.classList.add('d-none'));
+
+                // Show targeted section
+                document.getElementById(sectionId).classList.remove('d-none');
+                document.getElementById(sectionId).classList.add('d-block');
+
+                // Update Active State on Nav Buttons
+                document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+                document.getElementById(navId).classList.add('active');
+
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Ensure desktop always shows everything if resized
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992) {
+                document.querySelectorAll('.app-section').forEach(el => el.classList.remove('d-none'));
+            } else {
+                // Re-apply the active tab logic
+                const activeNav = document.querySelector('.nav-btn.active');
+                if (activeNav) activeNav.click();
+            }
+        });
+
+        // --- Helper Functions ---
         function showStatus(msg, isError = false) {
             const alert = document.getElementById('statusAlert');
-            alert.className = `alert ${isError ? 'alert-danger' : 'alert-success'} alert-floating font-weight-bold p-3`;
+            alert.className = `alert ${isError ? 'alert-danger' : 'alert-success'} alert-floating p-3`;
             alert.innerText = msg;
             alert.classList.remove('d-none');
             setTimeout(() => alert.classList.add('d-none'), 3500);
@@ -344,10 +408,9 @@
             return { host: document.getElementById('sftpHost').value, user: document.getElementById('sftpUser').value, pass: document.getElementById('sftpPass').value, path: document.getElementById('sftpPath').value };
         }
 
+        // --- Core Functions ---
         async function loadSchema() {
-            // Read from the checked radio button instead of a select box
             const model = document.querySelector('input[name="modelRadio"]:checked').value;
-
             const res = await fetch(`/api/schema/${model}`);
             const data = await res.json();
             const container = document.getElementById('dynamicFields');
@@ -355,12 +418,12 @@
 
             data.settings.forEach(setting => {
                 const col = document.createElement('div');
-                col.className = 'col-12 col-md-6'; // Full width on mobile, half on desktop
+                col.className = 'col-12 col-md-6 mb-2';
                 const val = activeEditorData[setting.key] || "";
 
-                let inputHtml = `<label class="form-label text-secondary fw-bold mb-1 mt-2">${setting.label}</label>`;
+                let inputHtml = `<label class="form-label text-secondary fw-bold mb-1">${setting.label}</label>`;
                 if (setting.type === 'choice') {
-                    inputHtml += `<select name="${setting.key}" class="form-select form-select-lg">`;
+                    inputHtml += `<select name="${setting.key}" class="form-select form-select-lg shadow-sm">`;
                     inputHtml += `<option value=""></option>`;
                     setting.options.forEach(opt => {
                         const selected = (opt === val) ? 'selected' : '';
@@ -368,7 +431,7 @@
                     });
                     inputHtml += `</select>`;
                 } else {
-                    inputHtml += `<input type="text" name="${setting.key}" class="form-control form-control-lg" value="${val}">`;
+                    inputHtml += `<input type="text" name="${setting.key}" class="form-control form-control-lg shadow-sm" value="${val}">`;
                 }
                 col.innerHTML = inputHtml;
                 container.appendChild(col);
@@ -407,17 +470,12 @@
                 document.getElementById('filenameInput').value = filename;
                 activeEditorData = result.data;
 
-                // Auto-detect model and check the correct radio button
-                if (Object.keys(activeEditorData).some(k => k.startsWith('pnhkeypad'))) {
-                    document.getElementById('model_6863i').checked = true;
-                } else if (Object.keys(activeEditorData).some(k => k.startsWith('softkey') || k.startsWith('topsoftkey'))) {
-                    document.getElementById('model_6867i').checked = true;
-                } else {
-                    document.getElementById('model_generic').checked = true;
-                }
+                if (Object.keys(activeEditorData).some(k => k.startsWith('pnhkeypad'))) document.getElementById('model_6863i').checked = true;
+                else if (Object.keys(activeEditorData).some(k => k.startsWith('softkey') || k.startsWith('topsoftkey'))) document.getElementById('model_6867i').checked = true;
+                else document.getElementById('model_generic').checked = true;
 
                 loadSchema();
-                window.scrollTo(0, 0);
+                switchTab('editor-section', 'nav-editor'); // Auto-switch to editor on mobile
                 showStatus(result.msg);
             } else showStatus(result.msg, true);
         }
@@ -438,14 +496,9 @@
             showStatus(result.msg, result.status !== 'success');
         }
 
-        async function importEndpoints() {
-            const fileInput = document.getElementById('importFile');
-            if (!fileInput.files.length) return showStatus("Select JSON file.", true);
-            const formData = new FormData(); formData.append('file', fileInput.files[0]);
-            const res = await fetch('/api/endpoints/import', { method: 'POST', body: formData });
-            const result = await res.json();
-            showStatus(result.msg, result.status !== 'success');
-            if (result.status === 'success') setTimeout(() => location.reload(), 1000);
+        function loadEndpointToEditor(mac) {
+            document.getElementById('filenameInput').value = mac.replace(/:/g, '').toLowerCase() + '.cfg';
+            switchTab('editor-section', 'nav-editor'); // Auto-switch to editor on mobile
         }
 
         async function fetchMac() {
@@ -455,7 +508,7 @@
             if (result.status === 'success') {
                 document.getElementById('filenameInput').value = result.mac.replace(/:/g, '').toLowerCase() + '.cfg';
                 showStatus(`MAC Found: ${result.mac}`);
-                window.scrollTo(0, 0); // Scroll to top to name file
+                switchTab('editor-section', 'nav-editor');
             } else showStatus(result.msg, true);
         }
 
@@ -466,6 +519,17 @@
             showStatus(result.msg);
         }
 
+        async function importEndpoints() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput.files.length) return showStatus("Select JSON file.", true);
+            const formData = new FormData(); formData.append('file', fileInput.files[0]);
+            const res = await fetch('/api/endpoints/import', { method: 'POST', body: formData });
+            const result = await res.json();
+            showStatus(result.msg, result.status !== 'success');
+            if (result.status === 'success') setTimeout(() => location.reload(), 1000);
+        }
+
+        // Init
         loadSchema();
     </script>
 </body>
