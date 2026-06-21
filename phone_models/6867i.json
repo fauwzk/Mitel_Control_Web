@@ -1,0 +1,120 @@
+{
+    "model": "6867i",
+    "description": "Mitel 6867i",
+    "settings": [
+        {
+            "key": "background image",
+            "label": "Wallpaper Filename",
+            "type": "string"
+        },
+        {
+            "key": "background image display mode",
+            "label": "Wallpaper Scaling",
+            "type": "choice",
+            "options": [
+                "0",
+                "1"
+            ]
+        },
+        {
+            "key": "topsoftkey1 type",
+            "label": "Top Key 1 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey2 type",
+            "label": "Top Key 2 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey3 type",
+            "label": "Top Key 3 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey4 type",
+            "label": "Top Key 4 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey5 type",
+            "label": "Top Key 5 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey6 type",
+            "label": "Top Key 6 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey7 type",
+            "label": "Top Key 7 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey8 type",
+            "label": "Top Key 8 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey9 type",
+            "label": "Top Key 9 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        },
+        {
+            "key": "topsoftkey10 type",
+            "label": "Top Key 10 Type",
+            "type": "choice",
+            "options": [
+                "none",
+                "speeddial",
+                "blf"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+services:
+  mitel-config-studio:
+    build: .
+    container_name: mitel_config_studio
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      # Map these directories so your custom models and endpoint database survive container restarts
+      - ./phone_models:/app/phone_models
+      - ./endpoints.json:/app/endpoints.json

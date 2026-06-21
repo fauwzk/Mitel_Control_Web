@@ -1,0 +1,52 @@
+{
+    "model": "generic",
+    "description": "Global SIP & Network Settings",
+    "settings": [
+        {
+            "key": "dhcp",
+            "label": "DHCP (1=On, 0=Off)",
+            "type": "choice",
+            "options": [
+                "1",
+                "0"
+            ]
+        },
+        {
+            "key": "tftp server",
+            "label": "TFTP Server IP Address",
+            "type": "string"
+        },
+        {
+            "key": "sip line1 screen name",
+            "label": "Screen Label (Line 1)",
+            "type": "string"
+        },
+        {
+            "key": "sip line1 auth name",
+            "label": "SIP Auth Name / Extension",
+            "type": "string"
+        },
+        {
+            "key": "sip line1 password",
+            "label": "SIP Auth Password",
+            "type": "string"
+        },
+        {
+            "key": "sip line1 proxy ip",
+            "label": "SIP Proxy / PBX IP",
+            "type": "string"
+        },
+        {
+            "key": "ring tone",
+            "label": "Ringtone ID (1-5)",
+            "type": "choice",
+            "options": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ]
+        }
+    ]
+}

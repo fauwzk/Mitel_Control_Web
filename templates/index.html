@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitel Web Config</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container py-4">
+        <h2 class="mb-4 text-primary">Mitel Config Studio</h2>
+
+        <div id="statusAlert" class="alert alert-info d-none" role="alert"></div>
+
+        <ul class="nav nav-tabs mb-3" id="appTabs">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#editor">Editor</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#sftp">SFTP / Setup</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#inventory">Inventory</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="editor">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
+                        <select id="modelSelect" class="form-select" onchange="loadSchema()">
+                            <option value="generic">Generic Settings</option>
+                            {% for model in models %}
+                            {% if model != 'generic' %}<option value="{{ model }}">{{ model }}</option>{% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" id="filenameInput" class="form-control" placeholder="MAC Address / Filename">
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-success w-100" onclick="generateAndUpload()">Push via SFTP</button>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form id="configForm">
+                            <div id="dynamicFields" class="row g-3"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="sftp">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">SFTP Server Info</h5>
+                        <div class="row g-2">
+                            <div class="col-sm-6"><input type="text" id="sftpHost" class="form-control"
+                                    value="10.19.13.1" placeholder="Host IP"></div>
+                            <div class="col-sm-6"><input type="text" id="sftpUser" class="form-control" value="root"
+                                    placeholder="User"></div>
+                            <div class="col-sm-6"><input type="password" id="sftpPass" class="form-control"
+                                    placeholder="Password"></div>
+                            <div class="col-sm-6"><input type="text" id="sftpPath" class="form-control"
+                                    value="/tftpboot" placeholder="Path"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Upload Wallpaper</h5>
+                        <input type="file" id="wallpaperFile" class="form-control mb-2" accept=".jpg,.png">
+                        <button class="btn btn-primary" onclick="uploadWallpaper()">Convert & Upload</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="inventory">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-sm-8"><input type="text" id="invIp" class="form-control"
+                                    placeholder="Target IP"></div>
+                            <div class="col-sm-4"><button class="btn btn-secondary w-100" onclick="fetchMac()">Get MAC
+                                    via ARP</button></div>
+                            <div class="col-12"><input type="password" id="phoneWebPass" class="form-control"
+                                    value="22222" placeholder="Phone Web Pass"></div>
+                            <div class="col-12"><button class="btn btn-danger w-100" onclick="rebootPhone()">Reboot
+                                    Phone via XML</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Import endpoints.json</h5>
+                    <div class="input-group">
+                        <input type="file" id="importFile" class="form-control" accept=".json">
+                        <button class="btn btn-outline-primary" onclick="importEndpoints()">Import</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showStatus(msg, isError = false) {
+            const alert = document.getElementById('statusAlert');
+            alert.className = `alert ${isError ? 'alert-danger' : 'alert-success'} mb-3`;
+            alert.innerText = msg;
+            alert.classList.remove('d-none');
+            setTimeout(() => alert.classList.add('d-none'), 5000);
+        }
+
+        async function loadSchema() {
+            const model = document.getElementById('modelSelect').value;
+            const res = await fetch(`/api/schema/${model}`);
+            const data = await res.json();
+
+            const container = document.getElementById('dynamicFields');
+            container.innerHTML = ''; // Clear existing
+
+            data.settings.forEach(setting => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6';
+                let inputHtml = `<label class="form-label text-muted small">${setting.label}</label>`;
+
+                if (setting.type === 'choice') {
+                    inputHtml += `<select name="${setting.key}" class="form-select">`;
+                    inputHtml += `<option value=""></option>`;
+                    setting.options.forEach(opt => inputHtml += `<option value="${opt}">${opt}</option>`);
+                    inputHtml += `</select>`;
+                } else {
+                    inputHtml += `<input type="text" name="${setting.key}" class="form-control">`;
+                }
+                col.innerHTML = inputHtml;
+                container.appendChild(col);
+            });
+        }
+
+        async function generateAndUpload() {
+            const form = document.getElementById('configForm');
+            const formData = new FormData(form);
+            let configLines = ['# Provisioning Profile'];
+
+            for (let [key, value] of formData.entries()) {
+                if (value) configLines.push(`${key}: ${value}`);
+            }
+
+            let filename = document.getElementById('filenameInput').value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if (!filename.endsWith('.CFG')) filename += '.cfg';
+
+            const payload = {
+                filename: filename.toLowerCase(),
+                content: configLines.join('\n') + '\n',
+                sftp: {
+                    host: document.getElementById('sftpHost').value,
+                    user: document.getElementById('sftpUser').value,
+                    pass: document.getElementById('sftpPass').value,
+                    path: document.getElementById('sftpPath').value
+                }
+            };
+
+            const res = await fetch('/api/sftp/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            showStatus(result.msg, result.status !== 'success');
+        }
+
+        async function fetchMac() {
+            const ip = document.getElementById('invIp').value;
+            const res = await fetch('/api/arp', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip })
+            });
+            const result = await res.json();
+            if (result.status === 'success') {
+                document.getElementById('filenameInput').value = result.mac.replace(/:/g, '') + '.cfg';
+                showStatus(`MAC Found: ${result.mac}`);
+            } else {
+                showStatus(result.msg, true);
+            }
+        }
+        async function importEndpoints() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput.files.length) {
+                return showStatus("Please select an endpoints.json file first.", true);
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch('/api/endpoints/import', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+
+                showStatus(result.msg, result.status !== 'success');
+
+                if (result.status === 'success') {
+                    // Reload the page after 1.5 seconds to refresh the endpoints list
+                    setTimeout(() => location.reload(), 1500);
+                }
+            } catch (e) {
+                showStatus("Upload failed due to a network or server error.", true);
+            }
+        }
+        async function rebootPhone() {
+            const payload = {
+                ip: document.getElementById('invIp').value,
+                password: document.getElementById('phoneWebPass').value
+            };
+            const res = await fetch('/api/reboot', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            showStatus(result.msg);
+        }
+
+        async function uploadWallpaper() {
+            const file = document.getElementById('wallpaperFile').files[0];
+            if (!file) return showStatus("Select a file first", true);
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('host', document.getElementById('sftpHost').value);
+            formData.append('user', document.getElementById('sftpUser').value);
+            formData.append('pass', document.getElementById('sftpPass').value);
+            formData.append('path', document.getElementById('sftpPath').value);
+
+            const res = await fetch('/api/wallpaper', { method: 'POST', body: formData });
+            const result = await res.json();
+            showStatus(result.msg, result.status !== 'success');
+        }
+
+        // Init
+        loadSchema();
+    </script>
+</body>
+
+</html>
