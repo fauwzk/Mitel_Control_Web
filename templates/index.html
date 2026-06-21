@@ -3,15 +3,23 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mitel Web Config</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Main App Background */
+        /* Dark Theme Base */
         body {
             background-color: #1c2128;
             color: #e0e6ed;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Stop mobile browsers from zooming in on inputs */
+        input,
+        select,
+        textarea {
+            font-size: 16px !important;
         }
 
         /* Panels and Cards */
@@ -19,18 +27,16 @@
             background-color: #232830;
             border: 1px solid #3c414b;
             margin-bottom: 1rem;
-            border-radius: 6px;
-            /* mvStyleVar_WindowRounding */
+            border-radius: 8px;
         }
 
-        /* Panel Headers */
         .card-header {
             background-color: #00509a;
             color: white;
             border-bottom: 1px solid #3c414b;
-            font-weight: 500;
-            padding: 0.6rem 1rem;
-            border-radius: 6px 6px 0 0 !important;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0 !important;
         }
 
         /* Inputs and Dropdowns */
@@ -39,8 +45,8 @@
             background-color: #1c2128;
             color: #e0e6ed;
             border: 1px solid #3c414b;
-            border-radius: 4px;
-            /* mvStyleVar_FrameRounding */
+            border-radius: 6px;
+            padding: 0.6rem;
         }
 
         .form-control:focus,
@@ -52,90 +58,138 @@
         }
 
         /* Standard Buttons */
-        .btn-custom,
-        .btn-secondary,
-        .btn-outline-primary,
-        .btn-outline-info,
-        .btn-outline-warning {
+        .btn-custom {
             background-color: #2d323a;
             color: #e0e6ed;
             border: 1px solid #3c414b;
         }
 
-        .btn-custom:hover,
-        .btn-secondary:hover,
-        .btn-outline-primary:hover,
-        .btn-outline-info:hover,
-        .btn-outline-warning:hover {
+        .btn-custom:hover {
             background-color: #0072ce;
             color: white;
             border-color: #0072ce;
         }
 
-        /* Primary / Success Buttons */
-        .btn-success,
-        .btn-primary {
-            background-color: #00509a;
-            color: white;
-            border: none;
-        }
-
-        .btn-success:hover,
-        .btn-primary:hover {
-            background-color: #0072ce;
-        }
-
-        /* List Group (Inventory Database) */
+        /* Massive Touch Targets for Lists */
         .list-group-item {
             background-color: #1c2128;
             color: #e0e6ed;
             border-color: #3c414b;
+            transition: all 0.2s;
         }
 
+        .list-group-item:active,
         .list-group-item:hover {
-            background-color: #2d323a;
-            color: white;
+            background-color: #0072ce !important;
+            color: white !important;
         }
 
         /* Floating Alerts */
         .alert-floating {
             position: fixed;
             top: 20px;
-            right: 20px;
-            z-index: 1050;
-            min-width: 300px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            min-width: 90%;
+            max-width: 400px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
             background-color: #00509a;
             color: white;
             border: 1px solid #0072ce;
+            text-align: center;
+            border-radius: 8px;
         }
 
         .alert-danger {
             background-color: #8b0000;
             border-color: #ff0000;
         }
+
+        /* Mobile Specific Overrides */
+        @media (max-width: 991px) {
+            body {
+                padding-bottom: 80px;
+            }
+
+            /* Space for bottom nav */
+            .mobile-bottom-bar {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1030;
+                background: #161b22;
+                border-top: 1px solid #3c414b;
+                padding: 0.5rem 0.25rem;
+                justify-content: space-evenly;
+                align-items: center;
+                box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+            }
+
+            .nav-btn {
+                color: #8b949e;
+                text-decoration: none;
+                font-size: 0.8rem;
+                text-align: center;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                width: 30%;
+            }
+
+            .nav-btn:active,
+            .nav-btn:focus {
+                background-color: #2d323a;
+                color: white;
+            }
+
+            .nav-icon {
+                display: block;
+                font-size: 1.4rem;
+                margin-bottom: 2px;
+            }
+
+            .sticky-mobile-push {
+                position: sticky;
+                top: 0;
+                z-index: 1020;
+                padding: 10px 0;
+                background-color: #232830;
+                border-bottom: 1px solid #3c414b;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .mobile-bottom-bar {
+                display: none;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container-fluid py-3">
-        <div id="statusAlert" class="alert d-none alert-floating" role="alert"></div>
+    <div id="statusAlert" class="alert d-none alert-floating font-weight-bold p-3" role="alert"></div>
 
-        <div class="row g-3">
-            <div class="col-12 col-xl-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Editor Setup</span>
-                        <div>
-                            <button class="btn btn-sm btn-success" onclick="generateAndUpload()">Push via SFTP</button>
-                        </div>
-                    </div>
+    <div class="container-fluid py-3">
+        <div class="row g-4">
+
+            <div class="col-12 col-lg-6" id="editor-section">
+                <div class="card h-100 shadow">
+                    <div class="card-header fs-5">⚙️ Editor Setup</div>
                     <div class="card-body">
-                        <div class="row g-2 mb-3 pb-3 border-bottom border-secondary">
+
+                        <div class="sticky-mobile-push mb-3 text-center">
+                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
+                                style="background-color:#00509a;" onclick="generateAndUpload()">🚀 PUSH CONFIG VIA
+                                SFTP</button>
+                        </div>
+
+                        <div class="row g-3 mb-4 pb-4 border-bottom border-secondary">
                             <div class="col-md-5">
-                                <label class="form-label small text-muted mb-1">Target Model</label>
-                                <div class="input-group input-group-sm">
+                                <label class="form-label text-muted fw-bold">Target Model</label>
+                                <div class="input-group input-group-lg">
                                     <select id="modelSelect" class="form-select" onchange="loadSchema()">
                                         <option value="generic">Generic Settings</option>
                                         {% for model in models %}
@@ -143,96 +197,105 @@
                                         endif %}
                                         {% endfor %}
                                     </select>
-                                    <button class="btn btn-outline-danger" onclick="deleteModel()"
-                                        title="Delete">X</button>
+                                    <button class="btn btn-danger" onclick="deleteModel()" title="Delete">🗑️</button>
                                 </div>
                             </div>
                             <div class="col-md-7">
-                                <label class="form-label small text-muted mb-1">Target Filename (.cfg)</label>
-                                <input type="text" id="filenameInput" class="form-control form-control-sm"
-                                    placeholder="e.g. 00085DXXXXXX.cfg">
+                                <label class="form-label text-muted fw-bold">Target Filename (.cfg)</label>
+                                <input type="text" id="filenameInput" class="form-control form-control-lg"
+                                    placeholder="00085DXXXXXX.cfg">
                             </div>
                         </div>
 
                         <form id="configForm">
-                            <div id="dynamicFields" class="row g-2"></div>
+                            <div id="dynamicFields" class="row g-3"></div>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="card shadow-sm mb-3">
-                    <div class="card-header">SFTP Credentials</div>
-                    <div class="card-body pb-2">
+            <div class="col-12 col-md-6 col-lg-3" id="sftp-section">
+                <div class="card shadow mb-4">
+                    <div class="card-header">🔑 SFTP Server</div>
+                    <div class="card-body">
                         <div class="row g-2">
-                            <div class="col-6"><input type="text" id="sftpHost" class="form-control form-control-sm"
-                                    value="10.19.13.1" placeholder="Host"></div>
-                            <div class="col-6"><input type="text" id="sftpUser" class="form-control form-control-sm"
-                                    value="root" placeholder="User"></div>
-                            <div class="col-6"><input type="password" id="sftpPass" class="form-control form-control-sm"
+                            <div class="col-6"><input type="text" id="sftpHost" class="form-control" value="10.19.13.1"
+                                    placeholder="Host"></div>
+                            <div class="col-6"><input type="text" id="sftpUser" class="form-control" value="root"
+                                    placeholder="User"></div>
+                            <div class="col-12"><input type="password" id="sftpPass" class="form-control"
                                     placeholder="Password"></div>
-                            <div class="col-6"><input type="text" id="sftpPath" class="form-control form-control-sm"
-                                    value="/tftpboot" placeholder="Path"></div>
+                            <div class="col-12"><input type="text" id="sftpPath" class="form-control" value="/tftpboot"
+                                    placeholder="Path"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm">
+                <div class="card shadow">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Server Files</span>
-                        <button class="btn btn-sm btn-custom" onclick="fetchSftpList()">Refresh List</button>
+                        <span>📁 Server Files</span>
+                        <button class="btn btn-sm btn-light text-dark fw-bold" onclick="fetchSftpList()">↻
+                            Refresh</button>
                     </div>
                     <div class="card-body p-0">
                         <div id="serverFileList" class="list-group list-group-flush"
-                            style="max-height: 280px; overflow-y: auto;">
-                            <div class="p-3 text-muted small text-center">Click Refresh to load files</div>
+                            style="max-height: 400px; overflow-y: auto;">
+                            <div class="p-4 text-muted text-center fs-6">Tap Refresh to load files</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="card shadow-sm mb-3">
-                    <div class="card-header">Device Actions</div>
-                    <div class="card-body pb-2">
-                        <label class="form-label small text-muted mb-1">Target Phone IP</label>
-                        <div class="input-group input-group-sm mb-2">
+            <div class="col-12 col-md-6 col-lg-3" id="inventory-section">
+                <div class="card shadow mb-4">
+                    <div class="card-header">📱 Device Actions</div>
+                    <div class="card-body">
+                        <label class="form-label text-muted fw-bold">Target Phone IP</label>
+                        <div class="input-group input-group-lg mb-3">
                             <input type="text" id="invIp" class="form-control" placeholder="10.x.x.x">
-                            <button class="btn btn-outline-info" onclick="fetchMac()">Get MAC</button>
+                            <button class="btn btn-info fw-bold" onclick="fetchMac()">Get MAC</button>
                         </div>
-                        <label class="form-label small text-muted mb-1">Phone Web Pass</label>
-                        <div class="input-group input-group-sm mb-2">
-                            <input type="password" id="phoneWebPass" class="form-control" value="22222">
-                            <button class="btn btn-outline-warning" onclick="rebootPhone()">Reboot</button>
+                        <label class="form-label text-muted fw-bold">Reboot Device</label>
+                        <div class="input-group input-group-lg">
+                            <input type="password" id="phoneWebPass" class="form-control" value="22222"
+                                placeholder="Web Pass">
+                            <button class="btn btn-warning fw-bold text-dark" onclick="rebootPhone()">Reboot</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm">
-                    <div class="card-header">Database</div>
-                    <div class="card-body">
-                        <div class="list-group mb-3" style="max-height: 200px; overflow-y: auto;">
+                <div class="card shadow">
+                    <div class="card-header">💾 Saved Database</div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush mb-2" style="max-height: 300px; overflow-y: auto;">
                             {% for ep in endpoints %}
-                            <button type="button"
-                                class="list-group-item list-group-item-action bg-dark text-light border-secondary p-2"
-                                onclick="document.getElementById('filenameInput').value = '{{ ep.mac.replace(':', '').lower() }}.cfg'">
-                                <small><strong>{{ ep.mac }}</strong><br>{{ ep.ip }} - {{ ep.label }}</small>
+                            <button type="button" class="list-group-item py-3 fs-6"
+                                onclick="document.getElementById('filenameInput').value = '{{ ep.mac.replace(':', '').lower() }}.cfg'; window.scrollTo(0,0);">
+                                <strong class="text-info">{{ ep.mac }}</strong><br>
+                                <span class="text-light">{{ ep.ip }} - {{ ep.label }}</span>
                             </button>
                             {% else %}
-                            <p class="text-muted small">No endpoints saved.</p>
+                            <div class="p-4 text-muted text-center">No endpoints saved.</div>
                             {% endfor %}
                         </div>
-
-                        <label class="form-label small text-muted mb-1">Import endpoints.json</label>
-                        <div class="input-group input-group-sm">
-                            <input type="file" id="importFile" class="form-control" accept=".json">
-                            <button class="btn btn-outline-primary" onclick="importEndpoints()">Merge</button>
+                        <div class="p-3 border-top border-secondary">
+                            <label class="form-label text-muted fw-bold small">Import endpoints.json</label>
+                            <div class="input-group">
+                                <input type="file" id="importFile" class="form-control" accept=".json">
+                                <button class="btn btn-outline-light" onclick="importEndpoints()">Import</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
+    </div>
+
+    <div class="mobile-bottom-bar">
+        <a href="#editor-section" class="nav-btn"><span class="nav-icon">⚙️</span>Editor</a>
+        <a href="#sftp-section" class="nav-btn"><span class="nav-icon">📁</span>Server</a>
+        <a href="#inventory-section" class="nav-btn"><span class="nav-icon">📱</span>Devices</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -241,19 +304,14 @@
 
         function showStatus(msg, isError = false) {
             const alert = document.getElementById('statusAlert');
-            alert.className = `alert ${isError ? 'alert-danger' : 'alert-success'} alert-floating`;
+            alert.className = `alert ${isError ? 'alert-danger' : 'alert-success'} alert-floating font-weight-bold p-3`;
             alert.innerText = msg;
             alert.classList.remove('d-none');
-            setTimeout(() => alert.classList.add('d-none'), 4000);
+            setTimeout(() => alert.classList.add('d-none'), 3500);
         }
 
         function getSftpConfig() {
-            return {
-                host: document.getElementById('sftpHost').value,
-                user: document.getElementById('sftpUser').value,
-                pass: document.getElementById('sftpPass').value,
-                path: document.getElementById('sftpPath').value
-            };
+            return { host: document.getElementById('sftpHost').value, user: document.getElementById('sftpUser').value, pass: document.getElementById('sftpPass').value, path: document.getElementById('sftpPath').value };
         }
 
         async function loadSchema() {
@@ -265,12 +323,12 @@
 
             data.settings.forEach(setting => {
                 const col = document.createElement('div');
-                col.className = 'col-md-6';
+                col.className = 'col-12 col-md-6'; // Full width on mobile, half on desktop
                 const val = activeEditorData[setting.key] || "";
 
-                let inputHtml = `<label class="form-label text-secondary small mb-0 mt-1">${setting.label}</label>`;
+                let inputHtml = `<label class="form-label text-secondary fw-bold mb-1 mt-2">${setting.label}</label>`;
                 if (setting.type === 'choice') {
-                    inputHtml += `<select name="${setting.key}" class="form-select form-select-sm">`;
+                    inputHtml += `<select name="${setting.key}" class="form-select form-select-lg">`;
                     inputHtml += `<option value=""></option>`;
                     setting.options.forEach(opt => {
                         const selected = (opt === val) ? 'selected' : '';
@@ -278,7 +336,7 @@
                     });
                     inputHtml += `</select>`;
                 } else {
-                    inputHtml += `<input type="text" name="${setting.key}" class="form-control form-control-sm" value="${val}">`;
+                    inputHtml += `<input type="text" name="${setting.key}" class="form-control form-control-lg" value="${val}">`;
                 }
                 col.innerHTML = inputHtml;
                 container.appendChild(col);
@@ -287,85 +345,55 @@
 
         async function fetchSftpList() {
             showStatus("Fetching files...");
-            const res = await fetch('/api/sftp/list', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getSftpConfig())
-            });
+            const res = await fetch('/api/sftp/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getSftpConfig()) });
             const result = await res.json();
 
             if (result.status === 'success') {
                 const list = document.getElementById('serverFileList');
-                list.innerHTML = ''; // Clear loading text
-
-                if (result.files.length === 0) {
-                    list.innerHTML = '<div class="p-3 text-muted small text-center">No .cfg files found.</div>';
-                    return showStatus("Directory is empty.");
-                }
+                list.innerHTML = '';
+                if (result.files.length === 0) return list.innerHTML = '<div class="p-4 text-muted text-center">No .cfg files found.</div>';
 
                 result.files.forEach(f => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    // Use Bootstrap classes to match your dark theme
-                    btn.className = 'list-group-item list-group-item-action bg-transparent text-light border-bottom border-secondary py-2';
-                    btn.innerHTML = `<span class="fw-bold text-primary">↓</span> ${f}`;
+                    btn.className = 'list-group-item list-group-item-action py-3 fs-5 text-light border-bottom border-secondary';
+                    btn.innerHTML = `📄 ${f}`;
                     btn.onclick = () => downloadSftpFile(f);
                     list.appendChild(btn);
                 });
                 showStatus(`Found ${result.files.length} configs.`);
-            } else {
-                showStatus(result.msg, true);
-            }
+            } else showStatus(result.msg, true);
         }
 
         async function downloadSftpFile(filename) {
             showStatus(`Downloading ${filename}...`);
-            const payload = getSftpConfig();
-            payload.filename = filename;
-
-            const res = await fetch('/api/sftp/download', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            });
+            const payload = getSftpConfig(); payload.filename = filename;
+            const res = await fetch('/api/sftp/download', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const result = await res.json();
 
             if (result.status === 'success') {
                 document.getElementById('filenameInput').value = filename;
                 activeEditorData = result.data;
-
-                // Auto-detect model based on specific keys
-                if (Object.keys(activeEditorData).some(k => k.startsWith('pnhkeypad'))) {
-                    document.getElementById('modelSelect').value = '6863i';
-                } else if (Object.keys(activeEditorData).some(k => k.startsWith('softkey') || k.startsWith('topsoftkey'))) {
-                    document.getElementById('modelSelect').value = '6867i';
-                }
-
-                loadSchema(); // Re-render the form
+                if (Object.keys(activeEditorData).some(k => k.startsWith('pnhkeypad'))) document.getElementById('modelSelect').value = '6863i';
+                else if (Object.keys(activeEditorData).some(k => k.startsWith('softkey') || k.startsWith('topsoftkey'))) document.getElementById('modelSelect').value = '6867i';
+                loadSchema();
+                window.scrollTo(0, 0); // Scroll back to top to see editor on mobile
                 showStatus(result.msg);
-            } else {
-                showStatus(result.msg, true);
-            }
+            } else showStatus(result.msg, true);
         }
 
         async function generateAndUpload() {
             const form = document.getElementById('configForm');
             const formData = new FormData(form);
             let configLines = ['# Provisioning Profile'];
-
-            for (let [key, value] of formData.entries()) {
-                if (value) configLines.push(`${key}: ${value}`);
-            }
+            for (let [key, value] of formData.entries()) if (value) configLines.push(`${key}: ${value}`);
 
             let filename = document.getElementById('filenameInput').value.replace(/[^a-zA-Z0-9-.]/g, '').toLowerCase();
             if (!filename) return showStatus("Enter a filename.", true);
             if (!filename.endsWith('.cfg')) filename += '.cfg';
 
-            const payload = {
-                filename: filename,
-                content: configLines.join('\n') + '\n',
-                sftp: getSftpConfig()
-            };
-
-            const res = await fetch('/api/sftp/upload', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            });
+            const payload = { filename: filename, content: configLines.join('\n') + '\n', sftp: getSftpConfig() };
+            const res = await fetch('/api/sftp/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const result = await res.json();
             showStatus(result.msg, result.status !== 'success');
         }
@@ -387,6 +415,7 @@
             if (result.status === 'success') {
                 document.getElementById('filenameInput').value = result.mac.replace(/:/g, '').toLowerCase() + '.cfg';
                 showStatus(`MAC Found: ${result.mac}`);
+                window.scrollTo(0, 0); // Scroll to top to name file
             } else showStatus(result.msg, true);
         }
 
