@@ -486,10 +486,11 @@
             let configLines = ['# Provisioning Profile'];
             for (let [key, value] of formData.entries()) if (value) configLines.push(`${key}: ${value}`);
 
-            // Force the entire filename to uppercase
-            let filename = document.getElementById('filenameInput').value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase();
-            if (!filename) return showStatus("Enter a filename.", true);
-            if (!filename.endsWith('.CFG')) filename += '.CFG';
+            let rawInput = document.getElementById('filenameInput').value.replace(/[^a-zA-Z0-9-.]/g, '');
+            if (!rawInput) return showStatus("Enter a filename.", true);
+
+            // Force MAC to uppercase, but enforce lowercase .cfg extension
+            let filename = rawInput.replace(/\.cfg$/i, '').toUpperCase() + '.cfg';
 
             const payload = { filename: filename, content: configLines.join('\n') + '\n', sftp: getSftpConfig() };
             const res = await fetch('/api/sftp/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -498,8 +499,8 @@
         }
 
         function loadEndpointToEditor(mac) {
-            document.getElementById('filenameInput').value = mac.replace(/:/g, '').toUpperCase() + '.CFG';
-            switchTab('editor-section', 'nav-editor'); // Auto-switch to editor on mobile
+            document.getElementById('filenameInput').value = mac.replace(/:/g, '').toUpperCase() + '.cfg';
+            switchTab('editor-section', 'nav-editor');
         }
 
         async function fetchMac() {
@@ -507,7 +508,7 @@
             const res = await fetch('/api/arp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
             const result = await res.json();
             if (result.status === 'success') {
-                document.getElementById('filenameInput').value = result.mac.replace(/:/g, '').toUpperCase() + '.CFG';
+                document.getElementById('filenameInput').value = result.mac.replace(/:/g, '').toUpperCase() + '.cfg';
                 showStatus(`MAC Found: ${result.mac}`);
                 switchTab('editor-section', 'nav-editor');
             } else showStatus(result.msg, true);
