@@ -486,9 +486,10 @@
             let configLines = ['# Provisioning Profile'];
             for (let [key, value] of formData.entries()) if (value) configLines.push(`${key}: ${value}`);
 
-            let filename = document.getElementById('filenameInput').value.replace(/[^a-zA-Z0-9-.]/g, '').toLowerCase();
+            // Force the entire filename to uppercase
+            let filename = document.getElementById('filenameInput').value.replace(/[^a-zA-Z0-9-.]/g, '').toUpperCase();
             if (!filename) return showStatus("Enter a filename.", true);
-            if (!filename.endsWith('.cfg')) filename += '.cfg';
+            if (!filename.endsWith('.CFG')) filename += '.CFG';
 
             const payload = { filename: filename, content: configLines.join('\n') + '\n', sftp: getSftpConfig() };
             const res = await fetch('/api/sftp/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -497,7 +498,7 @@
         }
 
         function loadEndpointToEditor(mac) {
-            document.getElementById('filenameInput').value = mac.replace(/:/g, '').toLowerCase() + '.cfg';
+            document.getElementById('filenameInput').value = mac.replace(/:/g, '').toUpperCase() + '.CFG';
             switchTab('editor-section', 'nav-editor'); // Auto-switch to editor on mobile
         }
 
@@ -506,7 +507,7 @@
             const res = await fetch('/api/arp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ip }) });
             const result = await res.json();
             if (result.status === 'success') {
-                document.getElementById('filenameInput').value = result.mac.replace(/:/g, '').toLowerCase() + '.cfg';
+                document.getElementById('filenameInput').value = result.mac.replace(/:/g, '').toUpperCase() + '.CFG';
                 showStatus(`MAC Found: ${result.mac}`);
                 switchTab('editor-section', 'nav-editor');
             } else showStatus(result.msg, true);
