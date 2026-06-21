@@ -160,6 +160,25 @@
             }
         }
 
+        /* Toggle Button Group Styles */
+        .btn-outline-model {
+            color: #8b949e;
+            border-color: #3c414b;
+            background-color: #232830;
+        }
+
+        .btn-check:checked+.btn-outline-model {
+            background-color: #00509a;
+            color: white;
+            border-color: #0072ce;
+            box-shadow: none;
+        }
+
+        .btn-outline-model:hover {
+            background-color: #2d323a;
+            color: white;
+        }
+
         @media (min-width: 992px) {
             .mobile-bottom-bar {
                 display: none;
@@ -180,31 +199,35 @@
                     <div class="card-header fs-5">⚙️ Editor Setup</div>
                     <div class="card-body">
 
-                        <div class="sticky-mobile-push mb-3 text-center">
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">1. Select Target Model</label>
+                            <div class="btn-group w-100 shadow-sm" role="group" aria-label="Model Selection">
+                                <input type="radio" class="btn-check" name="modelRadio" id="model_generic"
+                                    value="generic" autocomplete="off" checked onchange="loadSchema()">
+                                <label class="btn btn-outline-model fw-bold py-2" for="model_generic">Generic</label>
+
+                                {% for model in models %}
+                                {% if model != 'generic' %}
+                                <input type="radio" class="btn-check" name="modelRadio" id="model_{{ model }}"
+                                    value="{{ model }}" autocomplete="off" onchange="loadSchema()">
+                                <label class="btn btn-outline-model fw-bold py-2" for="model_{{ model }}">{{ model
+                                    }}</label>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">2. Target Filename (.cfg)</label>
+                            <input type="text" id="filenameInput"
+                                class="form-control form-control-lg text-center text-info fw-bold"
+                                placeholder="00085DXXXXXX.cfg">
+                        </div>
+
+                        <div class="sticky-mobile-push mb-4 text-center pb-4 border-bottom border-secondary">
                             <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
                                 style="background-color:#00509a;" onclick="generateAndUpload()">🚀 PUSH CONFIG VIA
                                 SFTP</button>
-                        </div>
-
-                        <div class="row g-3 mb-4 pb-4 border-bottom border-secondary">
-                            <div class="col-md-5">
-                                <label class="form-label text-muted fw-bold">Target Model</label>
-                                <div class="input-group input-group-lg">
-                                    <select id="modelSelect" class="form-select" onchange="loadSchema()">
-                                        <option value="generic">Generic Settings</option>
-                                        {% for model in models %}
-                                        {% if model != 'generic' %}<option value="{{ model }}">{{ model }}</option>{%
-                                        endif %}
-                                        {% endfor %}
-                                    </select>
-                                    <button class="btn btn-danger" onclick="deleteModel()" title="Delete">🗑️</button>
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <label class="form-label text-muted fw-bold">Target Filename (.cfg)</label>
-                                <input type="text" id="filenameInput" class="form-control form-control-lg"
-                                    placeholder="00085DXXXXXX.cfg">
-                            </div>
                         </div>
 
                         <form id="configForm">
@@ -315,7 +338,9 @@
         }
 
         async function loadSchema() {
-            const model = document.getElementById('modelSelect').value;
+            // Read from the checked radio button instead of a select box
+            const model = document.querySelector('input[name="modelRadio"]:checked').value;
+
             const res = await fetch(`/api/schema/${model}`);
             const data = await res.json();
             const container = document.getElementById('dynamicFields');
@@ -374,10 +399,18 @@
             if (result.status === 'success') {
                 document.getElementById('filenameInput').value = filename;
                 activeEditorData = result.data;
-                if (Object.keys(activeEditorData).some(k => k.startsWith('pnhkeypad'))) document.getElementById('modelSelect').value = '6863i';
-                else if (Object.keys(activeEditorData).some(k => k.startsWith('softkey') || k.startsWith('topsoftkey'))) document.getElementById('modelSelect').value = '6867i';
+
+                // Auto-detect model and check the correct radio button
+                if (Object.keys(activeEditorData).some(k => k.startsWith('pnhkeypad'))) {
+                    document.getElementById('model_6863i').checked = true;
+                } else if (Object.keys(activeEditorData).some(k => k.startsWith('softkey') || k.startsWith('topsoftkey'))) {
+                    document.getElementById('model_6867i').checked = true;
+                } else {
+                    document.getElementById('model_generic').checked = true;
+                }
+
                 loadSchema();
-                window.scrollTo(0, 0); // Scroll back to top to see editor on mobile
+                window.scrollTo(0, 0);
                 showStatus(result.msg);
             } else showStatus(result.msg, true);
         }
@@ -424,16 +457,6 @@
             const res = await fetch('/api/reboot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const result = await res.json();
             showStatus(result.msg);
-        }
-
-        async function deleteModel() {
-            const model = document.getElementById('modelSelect').value;
-            if (confirm(`Delete ${model}.json?`)) {
-                const res = await fetch(`/api/models/${model}`, { method: 'DELETE' });
-                const result = await res.json();
-                if (result.status === 'success') location.reload();
-                else showStatus(result.msg, true);
-            }
         }
 
         loadSchema();
